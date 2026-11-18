@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voice print: radial waveform</title>
+<style>
+:root { --bg:#FFFFFF; --text:#1F2328; --muted:#5F6670; --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color-scheme:light; }
+@media (prefers-color-scheme: dark) { :root { --bg:#16181B; --text:#E7E9EC; --muted:#9BA2AB; color-scheme:dark; } }
+body { margin:0; background:var(--bg); color:var(--text); font:15px/1.6 var(--sans); }
+main { max-width:760px; margin:0 auto; padding:32px 20px 48px; }
+h1 { font-size:22px; font-weight:600; margin:0; }
+.sub { color:var(--muted); margin:2px 0 16px; }
+svg { display:block; width:100%; height:auto; }
+.bucket { font:600 14px var(--sans); fill:var(--text); }
+.topic { cursor:pointer; transition:opacity .15s; }
+#readout { min-height:52px; color:var(--muted); margin:8px 0 16px; }
+#readout strong { color:var(--text); font-weight:600; }
+#readout q { font-family:var(--serif); color:var(--text); }
+.legend { display:flex; flex-wrap:wrap; gap:6px 16px; font-size:13px; color:var(--muted); margin:0 0 8px; padding:0; list-style:none; }
+.legend li { display:inline-flex; align-items:center; gap:6px; }
+.sw { display:inline-block; }
+@media (prefers-reduced-motion: reduce) { .topic { transition:none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Radial waveform</h1>
+  <p class="sub">Goals push out, concerns pull in</p>
+  <svg id="radial" viewBox="0 0 680 550" role="img" aria-label="Radial waveform voice print"></svg>
+  <div id="readout" aria-live="polite">Point at a cluster to see the topic, emotion and her words.</div>
+  <ul class="legend" id="emotions"></ul>
+  <ul class="legend">
+    <li><span class="sw" style="width:12px;height:4px;background:#EF9F27"></span>Goal: points outward</li>
+    <li><span class="sw" style="width:12px;height:4px;background:#D85A30"></span>Concern: points inward</li>
+    <li><span class="sw" style="width:4px;height:10px;background:var(--muted)"></span>Length: arousal</li>
+    <li><span class="sw" style="width:12px;height:2px;background:linear-gradient(90deg,var(--muted) 40%,transparent 40%,transparent 60%,var(--muted) 60%)"></span>Break: pause</li>
+    <li><span class="sw" style="width:14px;height:4px;border-radius:2px;background:#888780;opacity:.45"></span>Gray arc: time to start</li>
+    <li><span class="sw" style="width:2px;height:10px;background:#7F77DD"></span>Outer ring: identity, stable</li>
+  </ul>
+</main>
+<script src="data.js"></script>
+<script src="radial.js"></script>
+<script>
+  const data = window.VOICE_PRINT_DATA;
+  const { mix, total } = drawRadial(document.getElementById("radial"), data, document.getElementById("readout"));
+  document.getElementById("emotions").innerHTML = Object.entries(data.emotions).map(([k, v]) =>
+    `<li><span class="sw" style="width:10px;height:10px;border-radius:2px;background:${v.color}"></span>${v.label} ${Math.round((mix[k] || 0) / total * 100)}%</li>`
+  ).join("") + "<li>(centre: overall mix)</li>";
+</script>
+</body>
+</html>
